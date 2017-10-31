@@ -23,7 +23,15 @@ def gcd_consec(m, n):
 
 
 def sieve_to(n):
-	"""Simple sieving algorithm to get all primes up to the specified number"""
+	"""Get all primes up to a certain number using a sieve and a little caching magic"""
+	if sieve_to.prime_cache[len(sieve_to.prime_cache) - 1] >= n+1:
+		prime_list = []
+		for i in sieve_to.prime_cache:
+			if i > n + 1:
+				break
+			prime_list.append(i)
+		return prime_list
+
 	l = list(range(2, n+1))
 	for n in l:
 		for i in l[l.index(n):]:
@@ -31,7 +39,12 @@ def sieve_to(n):
 				continue
 			if i % n == 0:
 				del l[l.index(i)]  # This *might* run in linear time all on its own... whoops
+
+	# Place newly calculated prime list in the cache
+	if len(l) > len(sieve_to.prime_cache):
+		sieve_to.prime_cache = l
 	return l
+sieve_to.prime_cache = [2, 3, 5, 7]
 
 
 def factors_of(n):
@@ -58,7 +71,7 @@ def gcd_middleschool(m, n):
 
 	return i
 
-for m in range(1, 1001):
-	for n in range(1, 1001):
+for m in range(1, 101):
+	for n in range(1, 101):
 		if gcd_euclid(m, n) != gcd_middleschool(m, n):
 			print(str(m) + ", " + str(n) + " failed to validate")
