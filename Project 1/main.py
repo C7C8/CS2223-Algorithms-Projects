@@ -32,7 +32,7 @@ def sieve_to(n):
 			prime_list.append(i)
 		return prime_list
 
-	l = list(range(2, n+1))
+	l = sieve_to.prime_cache + list(range(sieve_to.prime_cache[len(sieve_to.prime_cache) - 1] + 1, n+1))
 	for n in l:
 		for i in l[l.index(n):]:
 			if i == n:
