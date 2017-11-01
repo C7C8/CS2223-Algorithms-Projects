@@ -61,15 +61,31 @@ def factors_of(n):
 		factor_list.append(n)
 	return factor_list
 
-def gcd_middleschool(m, n):
-	# What, did you really think I was going to write a list intersection algorithm myself? When one this good
-	# already exists?
-	factors = list((Counter(factors_of(m)) & Counter(factors_of(n))).elements())
-	i = 1
-	for factor in factors:
-		i *= factor
 
-	return i
+def gcd_middleschool(m, n):
+	"""Find the GCD of two numbers using the middleschool algorithm"""
+	mfactors = factors_of(m)
+	nfactors = factors_of(n)
+	factors = []
+
+	# Obtain list intesection between mfactors and nfactors
+	i = j = 0
+	while i != len(mfactors) and j != len(nfactors):
+		if mfactors[i] == nfactors[j]:
+			factors.append(mfactors[i])
+		elif mfactors[i] < nfactors[j]:
+			j -= 1
+		elif nfactors[j] < mfactors[i]:
+			i -= 1
+
+		i += 1
+		j += 1
+
+	prod = 1
+	for factor in factors:
+		prod *= factor
+
+	return prod
 
 for m in range(1, 101):
 	for n in range(1, 101):
