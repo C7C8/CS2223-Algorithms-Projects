@@ -113,11 +113,13 @@ repeat_count = int(input("Number of trials per number: "))
 outfile = str(input("Filename to save to: "))
 
 with open(outfile, 'w') as file:
-	writer = csv.writer(outfile)
+	writer = csv.writer(file)
+	results = []
 	print("Testing Euclid's algorithm...")
-	writer.writerow(test_gcd_algo(gcd_euclid, repeat_count, max_count))
+	results.append(test_gcd_algo(gcd_euclid, repeat_count, max_count))
 	print("Testing Consecutive Integer Checking algorithm...")
-	writer.writerow(test_gcd_algo(gcd_consec, repeat_count, max_count))
+	results.append(test_gcd_algo(gcd_consec, repeat_count, max_count))
 	print("Testing Middle School Algorithm... (this may take some time)")
-	writer.writerow(test_gcd_algo(gcd_middleschool, repeat_count, max_count))
+	results.append(test_gcd_algo(gcd_middleschool, repeat_count, max_count))
 	print("Done! All results are printed to a CSV file named \"" + outfile + "\"")
+	writer.writerow(results)
