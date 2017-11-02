@@ -122,4 +122,9 @@ with open(outfile, 'w') as file:
 	print("Testing Middle School Algorithm... (this may take some time)")
 	results.append(test_gcd_algo(gcd_middleschool, repeat_count, max_count))
 	print("Done! All results are printed to a CSV file named \"" + outfile + "\"")
-	writer.writerow(results)
+
+	# array transpose so Excel and friends can read the file easier
+	transpose = [[results[j][i] for j in range(len(results))] for i in range(len(results[0]))]
+	transpose.insert(0, ["Euclid", "CIC", "MS"])
+	for result in transpose:
+		writer.writerow(result)
