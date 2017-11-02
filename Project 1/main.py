@@ -1,6 +1,7 @@
 #!/usr/bin/python
-from collections import Counter
-
+import timeit
+import random
+import csv
 
 def gcd_euclid(m, n):
 	"""Implementation of Euclid's algorithm for finding a GCD"""
@@ -90,7 +91,33 @@ def gcd_middleschool(m, n):
 
 	return prod
 
-for m in range(1, 101):
-	for n in range(1, 101):
-		if gcd_euclid(m, n) != gcd_middleschool(m, n):
-			print(str(m) + ", " + str(n) + " failed to validate")
+
+def gcd_wrapper(algo, m, n):
+	def wrapped():
+		return algo(m, random.randint(2, n))
+	return wrapped
+
+
+def test_gcd_algo(algo, repeat_count, n):
+	"""Test an algo on a set of values, each time repeating the algorithm the specified amount of times """
+
+	timings = [0.0 for i in range(0, n)]
+	for i in range(1, n):
+		timings[i] += timeit.timeit(gcd_wrapper(algo, i, n), number=repeat_count)
+	for i in range(0, len(timings)):
+		timings[i] /= 2  # each number pair is actually run twice...
+	return timings
+
+max_count = int(input("Highest number to test up to: "))
+repeat_count = int(input("Number of trials per number: "))
+outfile = str(input("Filename to save to: "))
+
+with open(outfile, 'w') as file:
+	writer = csv.writer(outfile)
+	print("Testing Euclid's algorithm...")
+	writer.writerow(test_gcd_algo(gcd_euclid, repeat_count, max_count))
+	print("Testing Consecutive Integer Checking algorithm...")
+	writer.writerow(test_gcd_algo(gcd_consec, repeat_count, max_count))
+	print("Testing Middle School Algorithm... (this may take some time)")
+	writer.writerow(test_gcd_algo(gcd_middleschool, repeat_count, max_count))
+	print("Done! All results are printed to a CSV file named \"" + outfile + "\"")
