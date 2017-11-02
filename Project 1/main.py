@@ -33,12 +33,15 @@ def sieve_to(n):
 		return prime_list
 
 	l = sieve_to.prime_cache + list(range(sieve_to.prime_cache[len(sieve_to.prime_cache) - 1] + 1, n+1))
-	for n in l:
-		for i in l[l.index(n):]:
-			if i == n:
-				continue
-			if i % n == 0:
-				del l[l.index(i)]  # This *might* run in linear time all on its own... whoops
+	i = 0
+	while i < len(l): # Can't use regular range()-based loops here
+		j = i+1
+		while j < len(l):
+			if l[j] % l[i] == 0:
+				del l[j]
+				j -= 1
+			j += 1
+		i += 1
 
 	# Place newly calculated prime list in the cache
 	if len(l) > len(sieve_to.prime_cache):
@@ -47,7 +50,7 @@ def sieve_to(n):
 sieve_to.prime_cache = [2, 3, 5, 7]
 
 
-def factors_of(n):
+def factor(n):
 	"""Factor a number using a prime finding sieve and a little magic"""
 	prime_list = sieve_to(int(n / 2))
 	factor_list = []
@@ -64,11 +67,11 @@ def factors_of(n):
 
 def gcd_middleschool(m, n):
 	"""Find the GCD of two numbers using the middleschool algorithm"""
-	mfactors = factors_of(m)
-	nfactors = factors_of(n)
+	mfactors = factor(m)
+	nfactors = factor(n)
 	factors = []
 
-	# Obtain list intesection between mfactors and nfactors
+	# Obtain list intersection between mfactors and nfactors
 	i = j = 0
 	while i != len(mfactors) and j != len(nfactors):
 		if mfactors[i] == nfactors[j]:
@@ -82,8 +85,8 @@ def gcd_middleschool(m, n):
 		j += 1
 
 	prod = 1
-	for factor in factors:
-		prod *= factor
+	for f in factors:
+		prod *= f
 
 	return prod
 
