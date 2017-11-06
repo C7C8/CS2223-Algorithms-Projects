@@ -95,8 +95,16 @@ def gcd_middleschool(m, n):
 
 
 def gcd_wrapper(algo, m, n):
+	"""Wrapper needed so that timeit does what I need it to"""
 	def wrapped():
 		return algo(m, random.randint(2, n))
+	return wrapped
+
+
+def gcd_wrapper2(algo, m, n):
+	"""Used for testing individual cases"""
+	def wrapped():
+		return algo(m, n)
 	return wrapped
 
 
@@ -143,3 +151,11 @@ with open(outfile, 'w') as file:
 	transpose.insert(0, ["Euclid", "CIC", "MS"])
 	for result in transpose:
 		writer.writerow(result)
+
+sieve_to.prime_cache = [2, 3, 5, 7]  # Flush cache, it should be full of numbers from the previous runs
+print("Now testing individual test cases...")
+print("Result of gcd_euclid(31415, 14142): %d [%f s]" % (gcd_euclid(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_euclid, 31415, 14142), number=10)))
+print("Result of gcd_consec(31415, 14142): %d [%f s]" % (gcd_consec(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_consec, 31415, 14142), number=10)))
+print("Result of gcd_middleschool(31415, 14142): %d [%f s]" % (gcd_middleschool(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_middleschool, 31415, 14142), number=10)))
+sieve_to(31415)
+print("Result of gcd_middleschool(31415, 14142) [with cached primes]: %d [%f s]" % (gcd_middleschool(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_middleschool, 31415, 14142), number=10)))
