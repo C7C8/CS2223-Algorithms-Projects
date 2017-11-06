@@ -102,12 +102,9 @@ def gcd_wrapper(algo, m, n):
 
 def test_gcd_algo(algo, repeat_count, n):
 	"""Test an algo on a set of values, each time repeating the algorithm the specified amount of times """
-
-	timings = [0.0 for i in range(0, n)]
-	for i in range(1, n):
-		timings[i] += timeit.timeit(gcd_wrapper(algo, i, n), number=repeat_count)
-	for i in range(0, len(timings)):
-		timings[i] /= 2  # each number pair is actually run twice...
+	timings = [0.0 for i in range(0, n+1)]
+	for i in range(2, n+1):
+		timings[i] = timeit.timeit(gcd_wrapper(algo, i, n), number=repeat_count)
 	return timings
 
 
