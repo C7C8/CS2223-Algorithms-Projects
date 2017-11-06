@@ -2,6 +2,8 @@
 import timeit
 import random
 import csv
+import sys
+
 
 def gcd_euclid(m, n):
 	"""Implementation of Euclid's algorithm for finding a GCD"""
@@ -108,9 +110,25 @@ def test_gcd_algo(algo, repeat_count, n):
 		timings[i] /= 2  # each number pair is actually run twice...
 	return timings
 
-max_count = int(input("Highest number to test up to: "))
-repeat_count = int(input("Number of trials per number: "))
-outfile = str(input("Filename to save to: "))
+
+def get_number(str):
+	"""Written because it's a requirement for the project. IMO if the user can't enter valid input, they deserve the
+	resulting crash..."""
+	for i in range(0, 3):
+		try:
+			val = int(input(str))
+			if val <= 0:
+				raise ValueError
+			return val
+		except ValueError:
+			print("That's not a valid number...\n")
+	print("\nHow can you fail at this? It isn't even a test!")
+	exit(132)  # count to binary 132 on your fingers
+
+
+max_count = get_number("Highest number to test up to: ")
+repeat_count = get_number("Number of trials per number: ")
+outfile = input("Filename to save to: ")
 
 with open(outfile, 'w') as file:
 	writer = csv.writer(file)
