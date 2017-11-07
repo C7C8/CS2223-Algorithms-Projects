@@ -1,8 +1,8 @@
 #!/usr/bin/python
+from matplotlib import pyplot as plt, style
 import timeit
 import random
 import csv
-import sys
 
 
 def gcd_euclid(m, n):
@@ -97,65 +97,29 @@ def gcd_middleschool(m, n):
 def gcd_wrapper(algo, m, n):
 	"""Wrapper needed so that timeit does what I need it to"""
 	def wrapped():
-		return algo(m, random.randint(2, n))
-	return wrapped
-
-
-def gcd_wrapper2(algo, m, n):
-	"""Used for testing individual cases"""
-	def wrapped():
 		return algo(m, n)
 	return wrapped
 
+size = 1000
+sieve_to(size)
+data = [[0.0]*size for i in range(0, size)]
+mx = -1.0
+for i in range(0, size):
+	if i % 5 == 0:
+		print("%d/%d" % (i, size))
+	for j in range(0, size):
+		if i == j:
+			continue
+		data[i][j] = timeit.timeit(gcd_wrapper(gcd_consec, i, j), number=10)
+		if data[i][j] > mx:
+			mx = data[i][j]
 
-def test_gcd_algo(algo, repeat_count, n):
-	"""Test an algo on a set of values, each time repeating the algorithm the specified amount of times """
-	timings = [0.0 for i in range(0, n+1)]
-	for i in range(2, n+1):
-		timings[i] = timeit.timeit(gcd_wrapper(algo, i, n), number=repeat_count)
-	return timings
+# Normalize
+#for i in range(0, size):
+#	for j in range(0, size):
+#		data[i][j] /= mx
 
-
-def get_number(str):
-	"""Written because it's a requirement for the project. IMO if the user can't enter valid input, they deserve the
-	resulting crash..."""
-	for i in range(0, 3):
-		try:
-			val = int(input(str))
-			if val <= 0:
-				raise ValueError
-			return val
-		except ValueError:
-			print("That's not a valid number...\n")
-	print("\nHow can you fail at this? It isn't even a test!")
-	exit(132)  # count to binary 132 on your fingers
-
-
-max_count = get_number("Highest number to test up to: ")
-repeat_count = get_number("Number of trials per number: ")
-outfile = input("Filename to save to: ")
-
-with open(outfile, 'w') as file:
-	writer = csv.writer(file)
-	results = []
-	print("Testing Euclid's algorithm...")
-	results.append(test_gcd_algo(gcd_euclid, repeat_count, max_count))
-	print("Testing Consecutive Integer Checking algorithm...")
-	results.append(test_gcd_algo(gcd_consec, repeat_count, max_count))
-	print("Testing Middle School Algorithm... (this may take some time)")
-	results.append(test_gcd_algo(gcd_middleschool, repeat_count, max_count))
-	print("Done! All results are printed to a CSV file named \"" + outfile + "\"")
-
-	# array transpose so Excel and friends can read the file easier
-	transpose = [[results[j][i] for j in range(len(results))] for i in range(len(results[0]))]
-	transpose.insert(0, ["Euclid", "CIC", "MS"])
-	for result in transpose:
-		writer.writerow(result)
-
-sieve_to.prime_cache = [2, 3, 5, 7]  # Flush cache, it should be full of numbers from the previous runs
-print("Now testing individual test cases...")
-print("Result of gcd_euclid(31415, 14142): %d [%f s]" % (gcd_euclid(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_euclid, 31415, 14142), number=10)))
-print("Result of gcd_consec(31415, 14142): %d [%f s]" % (gcd_consec(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_consec, 31415, 14142), number=10)))
-print("Result of gcd_middleschool(31415, 14142): %d [%f s]" % (gcd_middleschool(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_middleschool, 31415, 14142), number=10)))
-sieve_to(31415)
-print("Result of gcd_middleschool(31415, 14142) [with cached primes]: %d [%f s]" % (gcd_middleschool(31415, 14142), timeit.timeit(gcd_wrapper2(gcd_middleschool, 31415, 14142), number=10)))
+figure, ax = plt.subplots()
+ax.imshow(data, extent=[0, size, 0, size], cmap="jet", origin="upper")
+ax.set_frame_on(False)
+plt.show()
