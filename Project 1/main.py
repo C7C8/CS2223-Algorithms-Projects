@@ -100,7 +100,7 @@ def gcd_wrapper(algo, m, n):
 		return algo(m, n)
 	return wrapped
 
-size = 1000
+size = 250
 sieve_to(size)
 data = [[0.0]*size for i in range(0, size)]
 mx = -1.0
@@ -115,9 +115,9 @@ for i in range(0, size):
 			mx = data[i][j]
 
 # Normalize
-#for i in range(0, size):
-#	for j in range(0, size):
-#		data[i][j] /= mx
+for i in range(0, size):
+	for j in range(0, size):
+		data[i][j] /= mx
 
 figure, ax = plt.subplots()
 ax.imshow(data, extent=[0, size, 0, size], cmap="jet", origin="upper")
