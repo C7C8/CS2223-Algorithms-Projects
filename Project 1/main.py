@@ -18,9 +18,8 @@ def gcd_consec(m, n):
 	"""Implementation of the consecutive GCD algorithm"""
 	t = min(m, n)
 	while t != 0:
-		if m % t == 0:
-			if n % t == 0:
-				return t
+		if m % t == 0 and n % t == 0:
+		    return t
 		t -= 1
 	return 1
 
