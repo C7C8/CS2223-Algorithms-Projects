@@ -2,14 +2,26 @@
 from math import sqrt
 from sys import argv
 from timeit import timeit
+from json import JSONDecodeError
 import json
 
 
 def parseInput(data):
 	"""Parses an input string in the form of [(X1,Y1),(X2,Y2),(X3,Y3),...(XN,YN)],
 	returning it as an Nx2 array. This is accomplished by replacing parens with
-	square brackets, and... using the python json parser on the result. I'm so sorry."""
-	return json.loads(data.replace("(", "[").replace(")", "]"))
+	square brackets, and... using the python json parser on the result. I'm so sorry.
+
+	The return form is a 3D array because multiple data sets can be contained within
+	one input string."""
+	data = data.replace("(", "[").replace(")", "]")
+	try:
+		return [json.loads(data)]
+	except JSONDecodeError:
+		if data.endswith("\n"):
+			data = data[0:len(data)-1]
+		data = "[" + data.replace("\n", ",") + "]"   # Should allow multiple lines of JSON input
+		return json.loads(data)
+
 
 
 def distance(c1, c2):
@@ -81,5 +93,11 @@ if len(argv) != 2:
 else:
 	with open(argv[1], "r") as inputFile:
 		coordstr = inputFile.read()
+coordSets = parseInput(coordstr)
+if len(coordSets) > 1:
+	print("Received %d sets of coordinates..." % len(coordSets))
 
-print(CP_Recursive(parseInput(coordstr)))
+for coords in coordSets:
+	print("Finding minimum distance in set: " + str(coords))
+	print("Brute force:\t%f (%f s)" % (CP_BruteForce(coords), timeit(CPWrapper(CP_BruteForce, coords), number=1000)))
+	print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=1000)))
