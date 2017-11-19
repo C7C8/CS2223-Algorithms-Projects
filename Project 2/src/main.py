@@ -3,6 +3,7 @@ from math import sqrt
 from sys import argv
 from timeit import timeit
 from json import JSONDecodeError
+from random import randint
 import json
 
 
@@ -88,16 +89,32 @@ def CPWrapper(algo, coords):
 	return wrapped
 
 
+# Get coordinate sets; if the user didn't give us an input file, pester them for input.
 if len(argv) != 2:
 	coordstr = str(input("Input list of coordinates in [(X1, Y1),(X2,Y2),...(XN,YN)] form:\n"))
+	if len(coordstr) == 0:
+		print("Didn't receive any input, creating a sequence of coordinate sets of increasing length")
+
+	temp = []
+	for size in range(5, 101):
+		current = []
+		for i in range(0, size):
+			current.append([randint(0, 100), randint(0, 100)])
+		temp.append(current)
+
+	# Strip off the first and last bracket so the parser function recognizes it as a multi set input. Yes, this is
+	# hideous. Yes, this sort of code keeps me up at night. Sorry for sharing this horror with you, grader...
+	coordstr = json.dumps(temp)[1:-1]
+
 else:
 	with open(argv[1], "r") as inputFile:
 		coordstr = inputFile.read()
 coordSets = parseInput(coordstr)
-if len(coordSets) > 1:
-	print("Received %d sets of coordinates..." % len(coordSets))
 
+# Run trials
+if len(coordSets) > 1:
+	print("Processing %d sets of coordinates..." % len(coordSets))
 for coords in coordSets:
-	print("Finding minimum distance in set: " + str(coords))
+	print("Finding minimum distance in set(%d): %s" % (len(coords), str(coords)))
 	print("Brute force:\t%f (%f s)" % (CP_BruteForce(coords), timeit(CPWrapper(CP_BruteForce, coords), number=1000)))
 	print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=1000)))
