@@ -96,6 +96,8 @@ parser.add_option("-r", "--random", dest="random", action="store_true", default=
 					help="use random coordinate sets instead of user input")
 parser.add_option("-f", "--file", dest="filename", action="store", type="string",
 					help="load coordinate sets from possibly multiline file")
+parser.add_option("-t", "--test", dest="testmode", action="store_true", default=False,
+					help="run in test mode, i.e. verify that output from the two algorithms matches")
 (options, args) = parser.parse_args()
 
 
@@ -123,7 +125,20 @@ else:
 coordSets = parseInput(coordstr)
 
 # Run trials, human readable
-if not options.csv:
+if options.testmode:
+	passCount = 0
+	for coords in coordSets:
+		print("Testing set of size %d...\t" % len(coords), end='')
+		r = CP_Recursive(coords)
+		b = CP_BruteForce(coords)
+		if r != b:
+			print("FAILED\t(B:%f\t!= R:%f)" % (b, r))
+		else:
+			print("OK\t\t(%f)" % b)
+			passCount += 1
+	print("Passed %d/%d (%s%%) tests" % (passCount, len(coordSets), "{0:.1f}".format(100.0 * (float(passCount)/float(len(coordSets))))))
+
+elif not options.csv:
 	if len(coordSets) > 1:
 		print("Processing %d sets of coordinates..." % len(coordSets))
 	for coords in coordSets:
