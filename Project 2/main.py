@@ -93,10 +93,11 @@ def CPWrapper(algo, coords):
 # Process command line options
 parser = OptionParser()
 parser.add_option("-c", "--csv", dest="csv", action="store_true", default=False,
-					help="Enable machine-readable CSV output")
+					help="enable machine-readable CSV output")
 parser.add_option("-r", "--random", dest="random", action="store_true", default=False,
-					help="Use random coordinate sets instead of user input")
-parser.add_option("-f", "--file", dest="filename", action="store", type="string")
+					help="use random coordinate sets instead of user input")
+parser.add_option("-f", "--file", dest="filename", action="store", type="string",
+					help="load coordinate sets from possibly multiline file")
 (options, args) = parser.parse_args()
 
 
