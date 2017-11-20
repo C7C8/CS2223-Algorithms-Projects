@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 from math import sqrt
 from math import ceil
-from math import floor
 from timeit import timeit
 from json import JSONDecodeError
 from random import randint
 from optparse import OptionParser
 import json
+
+import sys
 
 
 def parseInput(data):
@@ -24,7 +25,6 @@ def parseInput(data):
 			data = data[0:len(data)-1]
 		data = "[" + data.replace("\n", ",") + "]"   # Should allow multiple lines of JSON input
 		return json.loads(data)
-
 
 
 def distance(c1, c2):
@@ -60,21 +60,24 @@ def CP_RecurseWorker(P, Q):
 	prior to using this thing."""
 	size = len(P)
 	if size <= 3:
-		return CP_BruteForce(P)
+		pret = CP_BruteForce(P)
+		qret = CP_BruteForce(Q)
+		return pret if pret < qret else qret
 
-	Pl = P[0:ceil(size/2)]  # I LOVE THIS LANGUAGE
-	Ql = P[0:ceil(size/2)]
-	Pr = P[floor(size/2):]
-	Qr = P[floor(size/2):]
+	Pl = P[0:ceil(size/2.0)]  # I LOVE THIS LANGUAGE
+	Ql = Q[0:ceil(size/2.0)]
+	Pr = P[ceil(size/2.0):]
+	Qr = Q[ceil(size/2.0):]
 	dl = CP_RecurseWorker(Pl, Ql)
 	dr = CP_RecurseWorker(Pr, Qr)
 	d = dl if dl < dr else dr
-	m = P[ceil(size/2)-1][0]
+	m = P[ceil(size/2.0)-1][0]
 	S = list(filter(lambda x: abs(x[0] - m) < d, Q))  # RACKET IS CALLING TO ME
+	num = len(S)
 	dminsq = d**2
-	for i in range(0, len(S) - 2):
+	for i in range(0, num + 1):
 		k = i + 1
-		while k <= len(S) - 1 and (S[k][1] - S[i][1])**2 < dminsq:
+		while k <= num - 1 and (S[k][1] - S[i][1])**2 < dminsq:
 			temp = (S[k][0] - S[i][0])**2 + (S[k][1] - S[i][1])**2
 			dminsq = temp if temp < dminsq else dminsq
 			k += 1
@@ -103,9 +106,13 @@ parser.add_option("-t", "--test", dest="testmode", action="store_true", default=
 
 
 # Obtain coordinate sets; the user may be pestered for input if no file is provided and random is not set
-if options.random:
+if options.random and options.testmode:
+	print("ILLEGAL ARGUMENTS, YOU MAY *NOT* SEE WHAT OUTPUT THIS PRODUCES!", file=sys.stderr)
+	exit(132)
+
+elif options.random:
 	temp = []
-	for size in range(5, 256):
+	for size in range(5, 251):
 		current = []
 		for i in range(0, size):
 			# Keep generating points until a unique point is generated.
@@ -114,8 +121,6 @@ if options.random:
 				if current.count(point) == 0:
 					current.append(point)
 					break
-
-
 		temp.append(current)
 
 	# Strip off the first and last bracket so the parser function recognizes it as a multi set input. Yes, this is
@@ -125,14 +130,14 @@ if options.random:
 elif options.filename is None:
 	coordstr = str(input("Input list of coordinates in [(X1, Y1),(X2,Y2),...(XN,YN)] form:\n"))
 	if len(coordstr) == 0:
-		print("Didn't receive any user input, exiting!")
+		print("Didn't receive any user input!", file=sys.stderr)
 		exit(1)
 else:
 	with open(options.filename, "r") as inputFile:
 		coordstr = inputFile.read()
 coordSets = parseInput(coordstr)
 
-# Run trials, human readable
+# Test mode trials
 if options.testmode:
 	passCount = 0
 	for coords in coordSets:
@@ -146,6 +151,7 @@ if options.testmode:
 			passCount += 1
 	print("Passed %d/%d (%s%%) tests" % (passCount, len(coordSets), "{0:.1f}".format(100.0 * (float(passCount)/float(len(coordSets))))))
 
+# Human readable trials
 elif not options.csv:
 	if len(coordSets) > 1:
 		print("Processing %d sets of coordinates..." % len(coordSets))
@@ -153,8 +159,9 @@ elif not options.csv:
 		print("Finding minimum distance in set(%d): %s" % (len(coords), str(coords)))
 		print("Brute force:\t%f (%f s)" % (CP_BruteForce(coords), timeit(CPWrapper(CP_BruteForce, coords), number=100)))
 		print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=100)))
+
+# CSV (machine readable) trials
 else:
-	# Run trials, but with CSV output
 	print("Size,Value,BruteForce,Recursive,Set")
 	for coords in coordSets:
 		print("%d,%f,%f,%f,%s" % (len(coords),  CP_Recursive(coords),
