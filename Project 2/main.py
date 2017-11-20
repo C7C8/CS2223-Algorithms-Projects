@@ -113,7 +113,7 @@ if options.random:
 	# hideous. Yes, this sort of code keeps me up at night. Sorry for sharing this horror with you, grader...
 	coordstr = json.dumps(temp)[1:-1]
 
-elif len(options.filename) == 0:
+elif options.filename is None:
 	coordstr = str(input("Input list of coordinates in [(X1, Y1),(X2,Y2),...(XN,YN)] form:\n"))
 	if len(coordstr) == 0:
 		print("Didn't receive any user input, exiting!")
@@ -133,8 +133,9 @@ if not options.csv:
 		print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=100)))
 else:
 	# Run trials, but with CSV output
-	print("Size,Value,BruteForce,Recursive")
+	print("Size,Value,BruteForce,Recursive,Set")
 	for coords in coordSets:
-		print("%d,%f,%f,%f" % (len(coords), CP_Recursive(coords),
+		print("%d,%f,%f,%f,%s" % (len(coords),  CP_Recursive(coords),
 							timeit(CPWrapper(CP_BruteForce, coords), number=100),
-							timeit(CPWrapper(CP_Recursive, coords), number=100)))
+							timeit(CPWrapper(CP_Recursive, coords), number=100),
+							str(coords).replace(",", ";")))
