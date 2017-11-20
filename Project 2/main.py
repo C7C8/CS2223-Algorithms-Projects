@@ -36,9 +36,9 @@ def CP_BruteForce(coords):
 	pair of coordinates, returning the distance between them. Not very
 	efficient about anything I don't recommend using this thing."""
 	minDistance = 999999999.9
-	for c1 in coords:
-		for c2 in coords[coords.index(c1)+1:]:
-			d = distance(c1, c2)
+	for i in range(0, len(coords)):
+		for c2 in coords[i+1:]:
+			d = distance(coords[i], c2)
 			if d < minDistance:
 				minDistance = d
 	return minDistance
