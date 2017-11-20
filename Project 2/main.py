@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from math import sqrt
-from sys import argv
+from math import ceil
+from math import floor
 from timeit import timeit
 from json import JSONDecodeError
 from random import randint
@@ -61,14 +62,14 @@ def CP_RecurseWorker(P, Q):
 	if size <= 3:
 		return CP_BruteForce(P)
 
-	Pl = P[0:int(size/2)]  # I LOVE THIS LANGUAGE
-	Ql = P[0:int(size/2)]
-	Pr = P[int(size/2):]
-	Qr = P[int(size/2):]
+	Pl = P[0:ceil(size/2)]  # I LOVE THIS LANGUAGE
+	Ql = P[0:ceil(size/2)]
+	Pr = P[floor(size/2):]
+	Qr = P[floor(size/2):]
 	dl = CP_RecurseWorker(Pl, Ql)
 	dr = CP_RecurseWorker(Pr, Qr)
 	d = dl if dl < dr else dr
-	m = P[int(size/2)-1][0]
+	m = P[ceil(size/2)-1][0]
 	S = list(filter(lambda x: abs(x[0] - m) < d, Q))  # RACKET IS CALLING TO ME
 	dminsq = d**2
 	for i in range(0, len(S) - 2):
@@ -107,7 +108,14 @@ if options.random:
 	for size in range(5, 256):
 		current = []
 		for i in range(0, size):
-			current.append([randint(0, 100), randint(0, 100)])
+			# Keep generating points until a unique point is generated.
+			while True:
+				point = [randint(0, 100), randint(0, 100)]
+				if current.count(point) == 0:
+					current.append(point)
+					break
+
+
 		temp.append(current)
 
 	# Strip off the first and last bracket so the parser function recognizes it as a multi set input. Yes, this is
