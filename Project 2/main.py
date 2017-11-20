@@ -28,7 +28,7 @@ def parseInput(data):
 
 def distance(c1, c2):
 	"""Get distance between two points"""
-	return sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[0]) ** 2)
+	return sqrt(((c1[0] - c2[0]) ** 2) + ((c1[1] - c2[1]) ** 2))
 
 
 def CP_BruteForce(coords):
@@ -37,9 +37,7 @@ def CP_BruteForce(coords):
 	efficient about anything I don't recommend using this thing."""
 	minDistance = 999999999.9
 	for c1 in coords:
-		for c2 in coords:
-			if c1 == c2:
-				continue
+		for c2 in coords[coords.index(c1)+1:]:
 			d = distance(c1, c2)
 			if d < minDistance:
 				minDistance = d
