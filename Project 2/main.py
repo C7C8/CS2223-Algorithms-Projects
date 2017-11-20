@@ -103,7 +103,7 @@ parser.add_option("-f", "--file", dest="filename", action="store", type="string"
 # Obtain coordinate sets; the user may be pestered for input if no file is provided and random is not set
 if options.random:
 	temp = []
-	for size in range(5, 101):
+	for size in range(5, 256):
 		current = []
 		for i in range(0, size):
 			current.append([randint(0, 100), randint(0, 100)])
@@ -133,8 +133,8 @@ if not options.csv:
 		print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=100)))
 else:
 	# Run trials, but with CSV output
-	print("Size, Value, BruteForce, Recursive")
+	print("Size,Value,BruteForce,Recursive")
 	for coords in coordSets:
-		print("%d, %f, %f, %f" % (len(coords), CP_Recursive(coords),
+		print("%d,%f,%f,%f" % (len(coords), CP_Recursive(coords),
 							timeit(CPWrapper(CP_BruteForce, coords), number=100),
 							timeit(CPWrapper(CP_Recursive, coords), number=100)))
