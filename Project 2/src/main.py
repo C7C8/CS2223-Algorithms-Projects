@@ -4,6 +4,7 @@ from sys import argv
 from timeit import timeit
 from json import JSONDecodeError
 from random import randint
+from optparse import OptionParser
 import json
 
 
@@ -89,12 +90,18 @@ def CPWrapper(algo, coords):
 	return wrapped
 
 
-# Get coordinate sets; if the user didn't give us an input file, pester them for input.
-if len(argv) != 2:
-	coordstr = str(input("Input list of coordinates in [(X1, Y1),(X2,Y2),...(XN,YN)] form:\n"))
-	if len(coordstr) == 0:
-		print("Didn't receive any input, creating a sequence of coordinate sets of increasing length")
+# Process command line options
+parser = OptionParser()
+parser.add_option("-c", "--csv", dest="csv", action="store_true", default=False,
+					help="Enable machine-readable CSV output")
+parser.add_option("-r", "--random", dest="random", action="store_true", default=False,
+					help="Use random coordinate sets instead of user input")
+parser.add_option("-f", "--file", dest="filename", action="store", type="string")
+(options, args) = parser.parse_args()
 
+
+# Obtain coordinate sets; the user may be pestered for input if no file is provided and random is not set
+if options.random:
 	temp = []
 	for size in range(5, 101):
 		current = []
@@ -106,15 +113,28 @@ if len(argv) != 2:
 	# hideous. Yes, this sort of code keeps me up at night. Sorry for sharing this horror with you, grader...
 	coordstr = json.dumps(temp)[1:-1]
 
+elif len(options.filename) == 0:
+	coordstr = str(input("Input list of coordinates in [(X1, Y1),(X2,Y2),...(XN,YN)] form:\n"))
+	if len(coordstr) == 0:
+		print("Didn't receive any user input, exiting!")
+		exit(1)
 else:
-	with open(argv[1], "r") as inputFile:
+	with open(options.filename, "r") as inputFile:
 		coordstr = inputFile.read()
 coordSets = parseInput(coordstr)
 
-# Run trials
-if len(coordSets) > 1:
-	print("Processing %d sets of coordinates..." % len(coordSets))
-for coords in coordSets:
-	print("Finding minimum distance in set(%d): %s" % (len(coords), str(coords)))
-	print("Brute force:\t%f (%f s)" % (CP_BruteForce(coords), timeit(CPWrapper(CP_BruteForce, coords), number=1000)))
-	print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=1000)))
+# Run trials, human readable
+if not options.csv:
+	if len(coordSets) > 1:
+		print("Processing %d sets of coordinates..." % len(coordSets))
+	for coords in coordSets:
+		print("Finding minimum distance in set(%d): %s" % (len(coords), str(coords)))
+		print("Brute force:\t%f (%f s)" % (CP_BruteForce(coords), timeit(CPWrapper(CP_BruteForce, coords), number=100)))
+		print("Recursive:\t\t%f (%f s)\n" % (CP_Recursive(coords), timeit(CPWrapper(CP_Recursive, coords), number=100)))
+else:
+	# Run trials, but with CSV output
+	print("Size, Value, BruteForce, Recursive")
+	for coords in coordSets:
+		print("%d, %f, %f, %f" % (len(coords), CP_Recursive(coords),
+							timeit(CPWrapper(CP_BruteForce, coords), number=100),
+							timeit(CPWrapper(CP_Recursive, coords), number=100)))
