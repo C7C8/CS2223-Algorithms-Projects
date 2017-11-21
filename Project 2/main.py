@@ -64,10 +64,10 @@ def CP_RecurseWorker(P, Q):
 		qret = CP_BruteForce(Q)
 		return pret if pret < qret else qret
 
-	Pl = P[0:ceil(size/2.0)]  # I LOVE THIS LANGUAGE
-	Ql = Q[0:ceil(size/2.0)]
-	Pr = P[ceil(size/2.0):]
-	Qr = Q[ceil(size/2.0):]
+	Pl = P[0:ceil(size/2.0)+1]  # I LOVE THIS LANGUAGE
+	Ql = Q[0:ceil(size/2.0)+1]
+	Pr = P[ceil(size/2.0)-1:]
+	Qr = Q[ceil(size/2.0)-1:]
 	dl = CP_RecurseWorker(Pl, Ql)
 	dr = CP_RecurseWorker(Pr, Qr)
 	d = dl if dl < dr else dr
@@ -104,13 +104,7 @@ parser.add_option("-t", "--test", dest="testmode", action="store_true", default=
 					help="run in test mode, i.e. verify that output from the two algorithms matches")
 (options, args) = parser.parse_args()
 
-
-# Obtain coordinate sets; the user may be pestered for input if no file is provided and random is not set
-if options.random and options.testmode:
-	print("ILLEGAL ARGUMENTS, YOU MAY *NOT* SEE WHAT OUTPUT THIS PRODUCES!", file=sys.stderr)
-	exit(132)
-
-elif options.random:
+if options.random:
 	temp = []
 	for size in range(5, 251):
 		current = []
