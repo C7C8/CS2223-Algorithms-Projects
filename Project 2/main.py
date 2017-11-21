@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+
+# Christopher Myers 2017
+
 from math import sqrt
 from math import ceil
 from timeit import timeit
