@@ -36,7 +36,13 @@ def knapsack_dp(ksize, items):
 			else:
 				m[i][j] = max([m[i-1][j], m[i-1][j-items[i][0]] + items[i][1]])
 
+	print("\t", end="")
+	for i in range(ksize+1):
+		print("%d\t" % i, end="")
+	print("\n")
+
 	for i in m:
+		print("%d\t|" % m.index(i), end="")
 		for j in i:
 			print("%d\t" % j, end="")
 		print("")
@@ -45,6 +51,7 @@ def knapsack_dp(ksize, items):
 	i = len(items)-1
 	j = ksize
 	while i >= 0 and j >= 0:
+		print("On (%d, %d): %d" % (i, j, m[i][j]))
 		if m[i][j] != m[i-1][j]:
 			ret.append(items[i])
 			i -= 1
