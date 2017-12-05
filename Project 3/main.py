@@ -28,38 +28,26 @@ def knapsack_exhaustive(ksize, items):
 def knapsack_dp(ksize, items):
 	"""Solve knapsack problem using dynamic programming. This algorithm is heavily inspired by the pseudocode for it
 	found on Wikipedia... sorry. At least I didn't use CTRL-C/CTRL-V"""
-	m = [[0 for i in range(ksize+1)] for j in range(len(items))]
+	table = [[0 for i in range(ksize+1)] for j in range(len(items))]
 	for i in range(len(items)):
 		for j in range(ksize+1):
 			if items[i][0] > j:
-				m[i][j] = m[i-1][j]
+				table[i][j] = table[i-1][j]
 			else:
-				m[i][j] = max([m[i-1][j], m[i-1][j-items[i][0]] + items[i][1]])
-
-	print("\t", end="")
-	for i in range(ksize+1):
-		print("%d\t" % i, end="")
-	print("\n")
-
-	for i in m:
-		print("%d\t|" % m.index(i), end="")
-		for j in i:
-			print("%d\t" % j, end="")
-		print("")
+				table[i][j] = max([table[i-1][j], table[i-1][j-items[i][0]] + items[i][1]])
 
 	ret = []
 	i = len(items)-1
 	j = ksize
 	while i >= 0 and j >= 0:
-		print("On (%d, %d): %d" % (i, j, m[i][j]))
-		if m[i][j] != m[i-1][j]:
+		if table[i][j] != table[i-1][j]:
 			ret.append(items[i])
-			i -= 1
 			j -= items[i][0]
+			i -= 1
 		else:
 			i -= 1
 
-	return m[len(items)-1][ksize], ret
+	return table[len(items)-1][ksize], ret
 
 
 def knapsack_own(ksize, items):
