@@ -1,28 +1,16 @@
 import sys
-from collections import namedtuple
+from random import randint
 from itertools import chain
 from itertools import combinations
-
-def setvals(items):
-	"""Calculate the weight and value of a given set"""
-	val = weight = 0
-	for item in items:
-		weight += item[0]
-		val += item[1]
-	return weight, val
-
+from functools import reduce
 
 def knapsack_exhaustive(ksize, items):
 	"""Conduct exhaustive search by iterating over the power set of the input item list. This is absurdly expensive"""
+	# Why do in a loop what you can do with a few lambdas?
 	powerset = chain.from_iterable(combinations(items, r) for r in range(len(items)+1))
-	maxValue = 0
-	maxLst = []
-	for set in powerset:
-		weight,val = setvals(set)
-		if val > maxValue and weight <= ksize:
-			maxValue = val
-			maxLst = set
-	return maxValue, maxLst
+	powerset = filter(lambda s: sum(map(lambda i: i[0], s)) <= ksize, powerset)
+	best = max(powerset, key=lambda s: sum(map(lambda i: i[1], s)))
+	return sum(map(lambda i: i[1], best)), best
 
 
 def knapsack_dp(ksize, items):
@@ -51,7 +39,20 @@ def knapsack_dp(ksize, items):
 
 
 def knapsack_own(ksize, items):
-	pass
+	"""Do some recursive magic stuff to try to find a solution. I can't guarantee that this will actually work..."""
+
+	if len(items) <= 3:
+		return knapsack_exhaustive(ksize, items)
+
+	# Divide the list into two parts, sorted by weight. This is magic.
+	items = sorted(items, key=lambda x: x[0])
+	l = items[::2]
+	r = items[1::2]
+	lweight = sum(map(lambda i: i[0], l))
+	rweight = sum(map(lambda i: i[0], r))
+	lres, litems = knapsack_own((lweight / ksize) * ksize * 0.707, l)
+	rres, ritems = knapsack_own((rweight / ksize) * ksize * 0.707, r)
+	return knapsack_own(ksize, litems + ritems)
 
 
 def parse_input(filename):
@@ -68,13 +69,30 @@ def parse_input(filename):
 		return ksize, kitems
 
 
-if len(sys.argv) != 2:
+def genList(maxItems, maxWeight, maxValue):
+	"""Generate a list of random items"""
+	return [[randint(1, maxWeight), randint(1, maxValue)] for x in range(maxItems)]
+
+
+ksize = 0
+items = []
+if len(sys.argv) == 2:
+	ksize, items = parse_input(sys.argv[1])
+elif len(sys.argv) == 1:
+	ksize = randint(1, 100)
+	items = genList(10, 20, 100)
+else:
 	print("Invalid number of arguments")
 	exit(132)
 
-ksize, items = parse_input(sys.argv[1])
+print("Knapsack size:\t\t%d\t\t%s" % (ksize, str(items)))
 rVal, rLst = knapsack_exhaustive(ksize, items)
-print("Exhaustive result:\t%d\t%s" % (rVal, str(rLst)))
+rWgt = sum(map(lambda i: i[0], rLst))
+print("Exhaustive result:\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
 rVal, rLst = knapsack_dp(ksize, items)
-print("Dynamic result:\t\t%d\t%s" % (rVal, str(rLst)))
+rWgt = sum(map(lambda i: i[0], rLst))
+print("Dynamic result:\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
+rVal, rLst = knapsack_own(ksize, items)
+rWgt = sum(map(lambda i: i[0], rLst))
+print("Own result:\t\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
 
