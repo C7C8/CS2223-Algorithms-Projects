@@ -52,7 +52,7 @@ def knapsack_own(ksize, items):
 	rweight = sum(map(lambda i: i[0], r))
 	lres, litems = knapsack_own((lweight / ksize) * ksize * 0.707, l)
 	rres, ritems = knapsack_own((rweight / ksize) * ksize * 0.707, r)
-	return knapsack_own(ksize, litems + ritems)
+	return knapsack_exhaustive(ksize, litems + ritems)
 
 
 def parse_input(filename):
