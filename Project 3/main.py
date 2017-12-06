@@ -2,7 +2,7 @@ import sys
 from random import randint
 from itertools import chain
 from itertools import combinations
-from functools import reduce
+
 
 def knapsack_exhaustive(ksize, items):
 	"""Conduct exhaustive search by iterating over the power set of the input item list. This is absurdly expensive"""
@@ -27,7 +27,7 @@ def knapsack_dp(ksize, items):
 	ret = []
 	i = len(items)-1
 	j = ksize
-	while i >= 0 and j >= 0:
+	while i > 0 and j >= 0:
 		if table[i][j] != table[i-1][j]:
 			ret.append(items[i])
 			j -= items[i][0]
