@@ -15,8 +15,7 @@ def knapsack_exhaustive(ksize, items):
 
 
 def knapsack_dp(ksize, items):
-	"""Solve knapsack problem using dynamic programming. This algorithm is heavily inspired by the pseudocode for it
-	found on Wikipedia... sorry. At least I didn't use CTRL-C/CTRL-V"""
+	"""Solve knapsack problem using dynamic programming."""
 	table = [[0 for i in range(ksize+1)] for j in range(len(items))]
 	for i in range(len(items)):
 		for j in range(ksize+1):
@@ -101,17 +100,21 @@ else:
 # rWgt = sum(map(lambda i: i[0], rLst))
 # print("Own result:\t\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
 
-out = [["Exhaustive", "Dynamic", "Own"]]
+out = [["Dynamic", "Own"]]
 # Range of items to test for...
-for itemcount in range(3, 17):
+for itemcount in range(3, 23):
 	# Number of trials...
 	print("Testing on %d items..." % itemcount)
-	ksize = randint(20, 100)
-	items = genList(itemcount, 20, 100)
-	out.append([timeit(wrapper(knapsack_exhaustive, ksize, items), number=50),
-			  timeit(wrapper(knapsack_dp, ksize, items), number=50),
-			  timeit(wrapper(knapsack_own, ksize, items), number=50)])
+	line = [0, 0]
+	for trial in range(100):
+		ksize = randint(20, 100)
+		items = genList(itemcount, 20, 100)
+		line[0] += timeit(wrapper(knapsack_dp, ksize, items), number=5)
+		line[1] += timeit(wrapper(knapsack_own, ksize, items), number=5)
+	line[0] /= 100.0
+	line[1] /= 100.0
+	out.append(line)
 
 with open("output.csv", "w+") as file:
 	for line in out:
-		file.write("%s, %s, %s\n" % (line[0], line[1], line[2]))
+		file.write("%s, %s\n" % (line[0], line[1]))
