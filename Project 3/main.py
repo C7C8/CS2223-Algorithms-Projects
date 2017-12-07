@@ -2,6 +2,7 @@ import sys
 from random import randint
 from itertools import chain
 from itertools import combinations
+from timeit import timeit
 
 
 def knapsack_exhaustive(ksize, items):
@@ -73,6 +74,10 @@ def genList(maxItems, maxWeight, maxValue):
 	"""Generate a list of random items"""
 	return [[randint(1, maxWeight), randint(1, maxValue)] for x in range(maxItems)]
 
+def wrapper(algo, ksize, items):
+	def wrapped():
+		return algo(ksize, items)
+	return wrapped
 
 ksize = 0
 items = []
@@ -85,14 +90,28 @@ else:
 	print("Invalid number of arguments")
 	exit(132)
 
-print("Knapsack size:\t\t%d\t\t%s" % (ksize, str(items)))
-rVal, rLst = knapsack_exhaustive(ksize, items)
-rWgt = sum(map(lambda i: i[0], rLst))
-print("Exhaustive result:\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
-rVal, rLst = knapsack_dp(ksize, items)
-rWgt = sum(map(lambda i: i[0], rLst))
-print("Dynamic result:\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
-rVal, rLst = knapsack_own(ksize, items)
-rWgt = sum(map(lambda i: i[0], rLst))
-print("Own result:\t\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
+# print("Knapsack size:\t\t%d\t\t%s" % (ksize, str(items)))
+# rVal, rLst = knapsack_exhaustive(ksize, items)
+# rWgt = sum(map(lambda i: i[0], rLst))
+# print("Exhaustive result:\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
+# rVal, rLst = knapsack_dp(ksize, items)
+# rWgt = sum(map(lambda i: i[0], rLst))
+# print("Dynamic result:\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
+# rVal, rLst = knapsack_own(ksize, items)
+# rWgt = sum(map(lambda i: i[0], rLst))
+# print("Own result:\t\t\t%d, %d\t%s" % (rVal, rWgt, str(rLst)))
 
+out = [["Exhaustive", "Dynamic", "Own"]]
+# Range of items to test for...
+for itemcount in range(3, 17):
+	# Number of trials...
+	print("Testing on %d items..." % itemcount)
+	ksize = randint(20, 100)
+	items = genList(itemcount, 20, 100)
+	out.append([timeit(wrapper(knapsack_exhaustive, ksize, items), number=50),
+			  timeit(wrapper(knapsack_dp, ksize, items), number=50),
+			  timeit(wrapper(knapsack_own, ksize, items), number=50)])
+
+with open("output.csv", "w+") as file:
+	for line in out:
+		file.write("%s, %s, %s\n" % (line[0], line[1], line[2]))
